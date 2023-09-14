@@ -1,0 +1,30 @@
+@startuml database_schema
+
+!define Table(x) entity x as "x"
+
+Table(predictions.Prediction) {
+  + id : serial [PK]
+  wf_name : varchar(20) NOT NULL
+  prediction_date : timestamptz NOT NULL
+  prediction_from : timestamptz NOT NULL
+  prediction_to : timestamptz NOT NULL
+}
+
+Table(predictions.PredictionValue) {
+  + id : serial [PK]
+  prediction_id : int [FK]
+  prediction_for : timestamptz NOT NULL
+  value : int
+}
+
+Table(predictions.Model) {
+  + id : serial [PK]
+  prediction_value_id : int [FK]
+  model_uuid : varchar(50)
+  wtg_code : varchar(20) NOT NULL
+}
+
+predictions.Prediction --|| predictions.PredictionValue : "prediction_id" 1..*
+predictions.PredictionValue --|| predictions.Model : "prediction_value_id" 1..*
+
+@enduml

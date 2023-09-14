@@ -1,0 +1,48 @@
+{
+  "prediction": {
+    "wfName": "CrnoBrdo",
+    "predictionDate": "2023-09-12T14:00:00",
+    "predictionPeriod": {
+      "from": "2023-09-13T00:00:00",
+      "to": "2023-09-13T23:59:00"
+    },
+    "predictionValues": [
+      {
+        "wtgCode": "W1",
+        "modelUuid": "b926da1f-1b5c-4415-8ab6-7794ecf92348",
+        "predictions": [
+          {
+            "predictionFor": "2023-09-13T00:00:00",
+            "predictedValue_kWh": 1200
+          },
+          {
+            "predictionFor": "2023-09-13T01:00:00",
+            "predictedValue_kWh": 1000
+          },
+          {
+            "predictionFor": "2023-09-13T02:00:00",
+            "predictedValue_kWh": 950
+          }
+        ]
+      },
+      {
+        "wtgCode": "W2",
+        "modelUuid": "b926da1f-1b5c-4415-8ab6-7794ecf92348",
+        "predictions": [
+          {
+            "predictionFor": "2023-09-13T00:00:00",
+            "predictedValue_kWh": 1200
+          },
+          {
+            "predictionFor": "2023-09-13T01:00:00",
+            "predictedValue_kWh": 1000
+          },
+          {
+            "predictionFor": "2023-09-13T02:00:00",
+            "predictedValue_kWh": 950
+          }
+        ]
+      }
+    ]
+  }
+}
