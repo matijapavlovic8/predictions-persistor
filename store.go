@@ -6,6 +6,14 @@ import (
 	"log"
 )
 
+type Store interface {
+	CreateDatabase() error
+	GetPrediction(string, string, string) (*[]PredictionDto, error)
+	InsertPrediction(PredictionTableEntry) (int, error)
+	InsertPredictionValue(PredictionValueTableEntry, int) (int, error)
+	InsertPredictionModel(PredictionModelTableEntry, int) error
+}
+
 type PostgresStore struct {
 	db *sql.DB
 }
@@ -27,7 +35,7 @@ func NewPostgresStore() (*PostgresStore, error) {
 	}, nil
 }
 
-func (s *PostgresStore) createDatabase() error {
+func (s *PostgresStore) CreateDatabase() error {
 	queries := []string{
 		`CREATE TABLE IF NOT EXISTS predictions.Prediction (
 			id serial PRIMARY KEY,
@@ -102,4 +110,61 @@ func (s *PostgresStore) InsertPredictionModel(entry PredictionModelTableEntry, p
 		return err
 	}
 	return nil
+}
+
+func (s *PostgresStore) GetPrediction(wfName string, wtCodes string, timestamp string) (*[]PredictionDto, error) {
+
+	query := `SELECT
+		p.wf_name AS "wfName",
+		p.prediction_date AS "predictionDate",
+		p.prediction_from AS "predictionPeriod.from",
+		p.prediction_to AS "predictionPeriod.to",
+		m.wtg_code AS "predictionValues.wtgCode",
+		pv.prediction_for AS "predictionValues.predictions.predictionFor",
+		pv.value AS "predictionValues.predictions.predictedValue_kWh"
+		FROM
+			predictions.prediction AS p
+		JOIN
+			predictions.predictionvalue AS pv ON p.id = pv.prediction_id
+		JOIN
+			predictions.model AS m ON pv.id = m.prediction_value_id
+		WHERE
+			p.wf_name = $1
+		  	AND prediction_date = $2;
+    		--AND m.wtg_code IN ('W1', 'W2')`
+
+	rows, err := s.db.Query(query, wfName, timestamp)
+	if err != nil {
+		return nil, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
+
+	var predictions []PredictionDto
+
+	for rows.Next() {
+		prediction := PredictionDto{}
+
+		err := rows.Scan(
+			&prediction.WfName,
+			&prediction.PredictionDate,
+			&prediction.From,
+			&prediction.To,
+			&prediction.WtgCode,
+			&prediction.PredictionFor,
+			&prediction.ValueKwh,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+		predictions = append(predictions, prediction)
+	}
+
+	return &predictions, nil
+
 }

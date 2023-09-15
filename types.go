@@ -1,6 +1,6 @@
 package main
 
-type PredictionResponse struct {
+type PredictionJson struct {
 	Prediction struct {
 		WFName           string `json:"wfName"`
 		PredictionDate   string `json:"predictionDate"`
@@ -39,4 +39,14 @@ type PredictionModelTableEntry struct {
 type ModelValuePair struct {
 	Model PredictionModelTableEntry
 	Value PredictionValueTableEntry
+}
+
+type PredictionDto struct {
+	WfName         string `json:"wfName"`
+	PredictionDate string `json:"predictionDate"`
+	From           string `json:"from"`
+	To             string `json:"to"`
+	WtgCode        string `json:"wtgCode"`
+	PredictionFor  string `json:"predictionFor"`
+	ValueKwh       int    `json:"valueKwh"`
 }

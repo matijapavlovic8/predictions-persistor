@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-func parse() (*PredictionResponse, error) {
-	var predictionResponse PredictionResponse
+func parse() (*PredictionJson, error) {
+	var predictionResponse PredictionJson
 
 	path := "predictions.json"
 
@@ -38,7 +38,7 @@ func parse() (*PredictionResponse, error) {
 	return &predictionResponse, nil
 }
 
-func (response *PredictionResponse) mapToPredictionTableEntries() PredictionTableEntry {
+func (response *PredictionJson) mapToPredictionTableEntries() PredictionTableEntry {
 	wfName := response.Prediction.WFName
 	predictionDate := response.Prediction.PredictionDate
 	predictionFrom := response.Prediction.PredictionPeriod.From
@@ -52,7 +52,7 @@ func (response *PredictionResponse) mapToPredictionTableEntries() PredictionTabl
 	}
 }
 
-func (response *PredictionResponse) mapToPredictionValueAndModelEntries() []ModelValuePair {
+func (response *PredictionJson) mapToPredictionValueAndModelEntries() []ModelValuePair {
 	var modelValuePairs []ModelValuePair
 
 	for _, val := range response.Prediction.PredictionValues {
