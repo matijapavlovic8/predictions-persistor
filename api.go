@@ -69,7 +69,7 @@ func (s *Server) handlePredictions(w http.ResponseWriter, r *http.Request) error
 	wtCodes := r.URL.Query().Get("wtCodes")
 	timestamp := r.URL.Query().Get("timestamp")
 	timestamp = strings.Replace(timestamp, "Z", "+", -1)
-	prediction, err := s.store.GetPrediction(wfName, wtCodes, timestamp)
+	prediction, err := s.store.GetPrediction(wfName, timestamp, wtCodes)
 
 	if err != nil {
 		return err
@@ -99,17 +99,15 @@ func (s *Server) handlePersist(w http.ResponseWriter, r *http.Request) error {
 	pairs := predictionResponse.mapToPredictionValueAndModelEntries()
 
 	for _, pair := range pairs {
+		predictionModelId, err := s.store.InsertPredictionModel(pair.Model, predictionId)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("Error inserting prediction model: %v", err)
+			return err
 		}
-		predictionValueId, err := s.store.InsertPredictionValue(pair.Value, int(predictionId))
+		err = s.store.InsertPredictionValue(pair.Value, predictionModelId)
 		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = s.store.InsertPredictionModel(pair.Model, int(predictionValueId))
-		if err != nil {
-			log.Fatal(err)
+			log.Printf("Error inserting prediction value: %v", err)
+			return err
 		}
 	}
 
