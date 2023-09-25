@@ -1,4 +1,8 @@
-FROM ubuntu:latest
-LABEL authors="mpavlovic"
+FROM golang:1.20
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY . .
+
+RUN go build -o bin .
+ENTRYPOINT ["/app/bin"]

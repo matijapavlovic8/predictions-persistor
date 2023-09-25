@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -27,6 +28,8 @@ func (s *Server) Run() {
 
 	router.HandleFunc("/predictions/{wfName}", makeHTTPHandleFunc(s.handlePredictions))
 	router.HandleFunc("/persist", makeHTTPHandleFunc(s.handlePersist))
+	router.HandleFunc("/persist/rabbit", makeHTTPHandleFunc(s.handlePersistRabbit))
+	router.HandleFunc("/get/rabbit", makeHTTPHandleFunc(s.handleGetRabbit))
 
 	log.Println("JSON API server running on port", s.listenAddr)
 	err := http.ListenAndServe(s.listenAddr, router)
@@ -113,4 +116,22 @@ func (s *Server) handlePersist(w http.ResponseWriter, r *http.Request) error {
 
 	return WriteJSON(w, http.StatusOK, "data successfully persisted")
 
+}
+
+func (s *Server) handlePersistRabbit(w http.ResponseWriter, r *http.Request) error {
+	if r.Method != "POST" {
+		return fmt.Errorf("method not allowed")
+	}
+
+	message, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	RabbitSend(message)
+	return nil
+}
+
+func (s *Server) handleGetRabbit(w http.ResponseWriter, r *http.Request) error {
+	RabbitRecieve()
+	return nil
 }
